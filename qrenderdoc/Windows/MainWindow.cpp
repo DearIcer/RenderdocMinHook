@@ -23,6 +23,9 @@
  ******************************************************************************/
 
 #include "MainWindow.h"
+
+#include <quuid.h>
+
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -1143,36 +1146,8 @@ void MainWindow::CloseCapture()
 
 void MainWindow::SetTitle(const QString &filename)
 {
-  QString prefix;
-
-  if(m_Ctx.IsCaptureLoaded())
-  {
-    prefix = QFileInfo(filename).fileName();
-    if(m_Ctx.APIProps().degraded)
-      prefix += tr(" !DEGRADED PERFORMANCE!");
-    prefix += lit(" - ");
-  }
-
-  if(m_Ctx.Replay().CurrentRemote().IsValid())
-    prefix += tr("Remote: %1 - ").arg(m_Ctx.Replay().CurrentRemote().Name());
-
-  QString text = prefix + lit("RenderDoc ");
-
-  if(RENDERDOC_STABLE_BUILD)
-    text += lit(FULL_VERSION_STRING);
-  else
-    text += tr("Unstable %1 Build (%2 - %3)")
-                .arg(RENDERDOC_IsReleaseBuild() ? lit("Release") : lit("Development"))
-                .arg(lit(FULL_VERSION_STRING))
-                .arg(QString::fromLatin1(RENDERDOC_GetCommitHash()));
-
-  if(IsRunningAsAdmin())
-    text += tr(" (Administrator)");
-
-  if(QString::fromLatin1(RENDERDOC_GetVersionString()) != lit(MAJOR_MINOR_VERSION_STRING))
-    text += tr(" - !! VERSION MISMATCH DETECTED !!");
-
-  setWindowTitle(text);
+  QUuid guid = QUuid::createUuid();
+  setWindowTitle(guid.toString());
 }
 
 void MainWindow::SetTitle()

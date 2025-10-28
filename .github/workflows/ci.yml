@@ -16,7 +16,7 @@ defaults:
 jobs:
   commit-msg:
     name: Commit message check
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
     steps:
@@ -47,7 +47,7 @@ jobs:
         fi
   clang-format:
     name: Code formatting check
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: true
     steps:
@@ -70,7 +70,7 @@ jobs:
   cmake-minimum:
     name: Baseline cmake check
     needs: [commit-msg, clang-format]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       QT_SELECT: qt5
     strategy:
@@ -101,42 +101,149 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [ VS2015 x86 Development, VS2015 x64 Development, VS2015 x64 Release, VS2019 x64 Development, VS2022 x64 Development ]
+        name: [ VS2015 x86 Development, VS2015 x64 Development, VS2015 x64 Release, VS2022 x64 Development, VS2022 x64 Release ]
         include:
           - name: VS2015 x86 Development
-            os: windows-2019
+            os: windows-2025
             compiler: VS2015
             toolset: v140
             platform: x86
             configuration: Development
           - name: VS2015 x64 Development
-            os: windows-2019
+            os: windows-2025
             compiler: VS2015
             toolset: v140
             platform: x64
             configuration: Development
           - name: VS2015 x64 Release
-            os: windows-2019
+            os: windows-2025
             compiler: VS2015
             toolset: v140
             platform: x64
             configuration: Release
-          - name: VS2019 x64 Development
-            os: windows-2019
-            compiler: VS2019
-            toolset: v142
-            platform: x64
-            configuration: Development
           - name: VS2022 x64 Development
-            os: windows-2022
+            os: windows-2025
             compiler: VS2022
             toolset: v143
             platform: x64
             configuration: Development
+          - name: VS2022 x64 Release
+            os: windows-2025
+            compiler: VS2015
+            toolset: v143
+            platform: x64
+            configuration: Release
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 5
+
+    - name: Install VSSetup
+      run: Install-Module VSSetup -Scope CurrentUser
+      shell: powershell
+
+    - name: Show installed toolsets
+      run: |
+        echo "--- All:"
+        Get-VSSetupInstance -All
+        echo "--- VC140:"
+        Get-VSSetupInstance -All | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.140
+      shell: powershell
+
+      # try powershell command from https://github.com/actions/runner-images/issues/9873#issuecomment-2139288682
+    - if: matrix.toolset == 'v140'
+      name: Install VC.140 components
+      run: |
+        Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+        $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+        $componentsToRemove= @(
+        "Microsoft.VisualStudio.Component.VC.140"
+        "Microsoft.VisualStudio.Component.VC.14.29.16.11.ATL"
+        )
+        [string]$workloadArgs = $componentsToRemove | ForEach-Object {" --add " +  $_}
+        $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+        # should be run twice
+        $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+        $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+      shell: powershell
+
+    - if: matrix.toolset == 'v140'
+      name: Show installed toolsets
+      run: |
+        echo "--- All:"
+        Get-VSSetupInstance -All
+        echo "--- VC140:"
+        Get-VSSetupInstance -All | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.140
+      shell: powershell
+
+#       # try install-vs-components python script
+#     - if: matrix.toolset == 'v140'
+#       name: Install missing Visual Studio components
+#       run: python .github/workflows/install-vs-components.py
+# 
+#     - if: matrix.toolset == 'v140'
+#       name: Show installed toolsets
+#       run: |
+#         echo "--- All:"
+#         Get-VSSetupInstance -All
+#         echo "--- VC140:"
+#         Get-VSSetupInstance -All | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.140
+#       shell: powershell
+# 
+#       # try command from https://github.com/actions/runner-images/issues/9873#issuecomment-2833115951
+#     - if: matrix.toolset == 'v140'
+#       name: Install missing Visual Studio components
+#       run: |
+#         Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+#         $VsInstallPath = vswhere.exe -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+#         [string]$ComponentsToAdd = @(
+#         "Microsoft.VisualStudio.Component.VC.14.29.16.11.ATL"
+#         "Microsoft.VisualStudio.Component.VC.140"
+#         ) | ForEach-Object {"--add $_"}
+#         $ArgumentList = ('modify', '--installPath', "`"$VsInstallPath`"", $ComponentsToAdd, '--quiet', '--norestart', '--nocache')
+#         echo "vs_installer.exe $($ArgumentList -join ' ')"
+#         # should be run twice for some reason
+#         Start-Process -FilePath vs_installer.exe -ArgumentList $ArgumentList -Wait -PassThru -WindowStyle Hidden
+#         Start-Process -FilePath vs_installer.exe -ArgumentList $ArgumentList -Wait -PassThru -WindowStyle Hidden
+#       shell: powershell
+# 
+#     - if: matrix.toolset == 'v140'
+#       name: Show installed toolsets
+#       run: |
+#         echo "--- All:"
+#         Get-VSSetupInstance -All
+#         echo "--- VC140:"
+#         Get-VSSetupInstance -All | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.140
+#       shell: powershell
+# 
+#       # try winget
+#     - if: matrix.toolset == 'v140'
+#       name: Show installed toolsets
+#       run: winget install --accept-package-agreements --accept-source-agreements Microsoft.BuildTools2015
+#     
+#     - if: matrix.toolset == 'v140'
+#       name: Show installed toolsets
+#       run: |
+#         echo "--- All:"
+#         Get-VSSetupInstance -All
+#         echo "--- VC140:"
+#         Get-VSSetupInstance -All | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.140
+#       shell: powershell
+# 
+#       # try chocolatey
+#     - if: matrix.toolset == 'v140'
+#       name: Show installed toolsets
+#       run: choco install visualcppbuildtools
+# 
+#     - if: matrix.toolset == 'v140'
+#       name: Show installed toolsets
+#       run: |
+#         echo "--- All:"
+#         Get-VSSetupInstance -All
+#         echo "--- VC140:"
+#         Get-VSSetupInstance -All | Select-VSSetupInstance -Latest -Require Microsoft.VisualStudio.Component.VC.140
+#       shell: powershell
+
     - name: Download optional 3rdparty extras
       run: |
         curl https://renderdoc.org/qrenderdoc_3rdparty.zip -O
@@ -163,7 +270,7 @@ jobs:
   docs:
     name: Documentation Build
     needs: [commit-msg, clang-format]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       QT_SELECT: qt5
     steps:
@@ -191,7 +298,7 @@ jobs:
   linux:
     name: Linux
     needs: [commit-msg, clang-format]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       QT_SELECT: qt5
     strategy:
@@ -225,20 +332,23 @@ jobs:
         sudo add-apt-repository -y 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-3.8 main'
         sudo apt-get update
         curl -LO http://archive.ubuntu.com/ubuntu/pool/main/libf/libffi/libffi6_3.2.1-8_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libobjc-5-dev_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/gcc-5-base_5.5.0-12ubuntu1_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libubsan0_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libobjc-5-dev_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/gcc-5-base_5.4.0-6ubuntu1~16.04.12_amd64.deb
         curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/i/isl-0.18/libisl15_0.18-4_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/cpp-5_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libasan2_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libmpx0_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libgcc-5-dev_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/gcc-5_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/libstdc++-5-dev_5.5.0-12ubuntu1_amd64.deb
-        curl -LO http://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-5/g++-5_5.5.0-12ubuntu1_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/cpp-5_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libasan2_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libmpx0_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libgcc-5-dev_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/gcc-5_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++-5-dev_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libcilkrts5_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/g++-5_5.4.0-6ubuntu1~16.04.12_amd64.deb
+        curl -LO http://archive.ubuntu.com/ubuntu/pool/main/m/mpfr4/libmpfr4_3.1.4-1_amd64.deb
         sudo apt install ./*.deb
     - name: Install compilation dependencies
       run: |
-        sudo apt-get install -y libx11-dev mesa-common-dev libgl1-mesa-dev qtbase5-dev libqt5svg5-dev libqt5x11extras5-dev libxcb-keysyms1-dev libx11-xcb-dev clang++-3.8 g++-5
+        sudo apt-get install -y libx11-dev mesa-common-dev libgl1-mesa-dev qtbase5-dev libqt5svg5-dev libqt5x11extras5-dev libxcb-keysyms1-dev libx11-xcb-dev clang-3.8 g++-5 clang-12 
     - name: Build
       run: |
         mkdir build
@@ -263,7 +373,7 @@ jobs:
   android:
     name: Android
     needs: [commit-msg, clang-format]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
       with:
@@ -274,6 +384,8 @@ jobs:
         java-version: '8'
     - name: Install Android SDK 3859397 and NDK r14b
       run: |
+        sudo apt-get update
+        sudo apt-get install -y libncurses5
         export ARCH=`uname -m`
         wget -q http://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
         wget -q http://dl.google.com/android/repository/android-ndk-r14b-linux-${ARCH}.zip
@@ -298,7 +410,7 @@ jobs:
   macOS:
     name: Mac
     needs: [commit-msg, clang-format]
-    runs-on: macos-13
+    runs-on: macos-14
     strategy:
       fail-fast: false
       matrix:

@@ -4,7 +4,8 @@ set(RDOC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(RDOC_DEFINITIONS PRIVATE -DRENDERDOC_EXPORTS)
 set(RDOC_INCLUDES
     PRIVATE ${RDOC_SOURCE_DIR}
-    PRIVATE ${RDOC_SOURCE_DIR}/3rdparty)
+    PRIVATE ${RDOC_SOURCE_DIR}/3rdparty
+    PRIVATE ${RDOC_SOURCE_DIR}/3rdparty/minhook/include)
 set(RDOC_LIBRARIES)
 
 option(ENABLE_DLSYM_HOOKING "Enable dlsym() hooking via glibc internals" OFF)
@@ -288,7 +289,19 @@ set(sources
     3rdparty/tinyexr/tinyexr.cpp
     3rdparty/tinyexr/tinyexr.h
     3rdparty/tinyfiledialogs/tinyfiledialogs.c
-    3rdparty/tinyfiledialogs/tinyfiledialogs.h)
+    3rdparty/tinyfiledialogs/tinyfiledialogs.h
+    3rdparty/minhook/src/buffer.c
+    3rdparty/minhook/src/buffer.h
+    3rdparty/minhook/src/hook.c
+    3rdparty/minhook/src/trampoline.c
+    3rdparty/minhook/src/trampoline.h
+    3rdparty/minhook/src/hde/hde32.c
+    3rdparty/minhook/src/hde/hde32.h
+    3rdparty/minhook/src/hde/hde64.c
+    3rdparty/minhook/src/hde/hde64.h
+    3rdparty/minhook/src/hde/pstdint.h
+    3rdparty/minhook/src/hde/table32.h
+    3rdparty/minhook/src/hde/table64.h)
 
 if(ANDROID)
     list(APPEND sources

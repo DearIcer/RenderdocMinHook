@@ -27,6 +27,7 @@
 #include "api/app/renderdoc_app.h"
 #include "common/common.h"
 #include "core/core.h"
+#include "hooks/hooks.h"
 
 int RENDERDOC_CC SetCaptureOptionU32(RENDERDOC_CaptureOption opt, uint32_t val)
 {
@@ -57,6 +58,10 @@ int RENDERDOC_CC SetCaptureOptionU32(RENDERDOC_CaptureOption opt, uint32_t val)
         RDCWARN("AllowUnsupportedVendorExtensions unexpected parameter %x", val);
       break;
     case eRENDERDOC_Option_SoftMemoryLimit: opts.softMemoryLimit = val; break;
+    case eRENDERDOC_Option_HookMode: 
+      opts.hookMode = val;
+      LibraryHooks::SetHookMode(val);
+      break;
     default: RDCLOG("Unrecognised capture option '%d'", opt); return 0;
   }
 
@@ -90,6 +95,10 @@ int RENDERDOC_CC SetCaptureOptionF32(RENDERDOC_CaptureOption opt, float val)
       RDCWARN("AllowUnsupportedVendorExtensions unexpected parameter %f", val);
       break;
     case eRENDERDOC_Option_SoftMemoryLimit: opts.softMemoryLimit = (uint32_t)val; break;
+    case eRENDERDOC_Option_HookMode: 
+      opts.hookMode = (uint32_t)val;
+      LibraryHooks::SetHookMode((uint32_t)val);
+      break;
     default: RDCLOG("Unrecognised capture option '%d'", opt); return 0;
   }
 
@@ -129,6 +138,8 @@ uint32_t RENDERDOC_CC GetCaptureOptionU32(RENDERDOC_CaptureOption opt)
     case eRENDERDOC_Option_AllowUnsupportedVendorExtensions: return 0;
     case eRENDERDOC_Option_SoftMemoryLimit:
       return (RenderDoc::Inst().GetCaptureOptions().softMemoryLimit);
+    case eRENDERDOC_Option_HookMode:
+      return (RenderDoc::Inst().GetCaptureOptions().hookMode);
     default: break;
   }
 
@@ -168,6 +179,8 @@ float RENDERDOC_CC GetCaptureOptionF32(RENDERDOC_CaptureOption opt)
     case eRENDERDOC_Option_AllowUnsupportedVendorExtensions: return 0.0f;
     case eRENDERDOC_Option_SoftMemoryLimit:
       return (RenderDoc::Inst().GetCaptureOptions().softMemoryLimit * 1.0f);
+    case eRENDERDOC_Option_HookMode:
+      return (RenderDoc::Inst().GetCaptureOptions().hookMode * 1.0f);
     default: break;
   }
 
@@ -191,6 +204,7 @@ CaptureOptions::CaptureOptions()
   captureAllCmdLists = false;
   debugOutputMute = true;
   softMemoryLimit = 0;
+  hookMode = 0; // Default to IAT patching
 }
 
 #if ENABLED(ENABLE_UNIT_TESTS)

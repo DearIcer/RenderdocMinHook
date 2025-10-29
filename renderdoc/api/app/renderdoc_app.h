@@ -228,6 +228,16 @@ typedef enum RENDERDOC_CaptureOption
   //
   // Default - 0 Megabytes
   eRENDERDOC_Option_SoftMemoryLimit = 13,
+  
+  // Select which hooking method to use on Windows platforms.
+  // RenderDoc supports two different hooking mechanisms on Windows - the default IAT patching method,
+  // and an alternative MinHook method.
+  //
+  // Default - 0 (IAT patching)
+  //
+  // 0 - Use IAT patching method for hooking.
+  // 1 - Use MinHook method for hooking.
+  eRENDERDOC_Option_HookMode = 14,
 } RENDERDOC_CaptureOption;
 
 // Sets an option that controls how RenderDoc behaves on capture.
@@ -585,7 +595,7 @@ typedef enum RENDERDOC_Version
   eRENDERDOC_API_Version_1_3_0 = 10300,    // RENDERDOC_API_1_3_0 = 1 03 00
   eRENDERDOC_API_Version_1_4_0 = 10400,    // RENDERDOC_API_1_4_0 = 1 04 00
   eRENDERDOC_API_Version_1_4_1 = 10401,    // RENDERDOC_API_1_4_1 = 1 04 01
-  eRENDERDOC_API_Version_1_4_2 = 10402,    // RENDERDOC_API_1_4_2 = 1 04 02
+  eRENDERDOC_API_Version_1_4_2 = 10402,    // RENDERDOC_API_1_4_02 = 1 04 02
   eRENDERDOC_API_Version_1_5_0 = 10500,    // RENDERDOC_API_1_5_0 = 1 05 00
   eRENDERDOC_API_Version_1_6_0 = 10600,    // RENDERDOC_API_1_6_0 = 1 06 00
 } RENDERDOC_Version;

@@ -177,6 +177,9 @@ public:
   // replay-type programs.
   static bool Detect(const char *identifier);
 
+  // Set hook mode on Windows (0 = IAT patching, 1 = MinHook)
+  static void SetHookMode(uint32_t hookMode);
+
 private:
   static void BeginHookRegistration();
   static void EndHookRegistration();

@@ -26,6 +26,10 @@
 #include "hooks.h"
 #include "common/common.h"
 
+#if ENABLED(RDOC_WIN32)
+extern void Win32_SetHookMode(bool useMinHook);
+#endif
+
 static rdcarray<LibraryHook *> &LibList()
 {
   static rdcarray<LibraryHook *> libs;
@@ -57,4 +61,12 @@ void LibraryHooks::OptionsUpdated()
 {
   for(LibraryHook *lib : LibList())
     lib->OptionsUpdated();
+}
+
+void LibraryHooks::SetHookMode(uint32_t hookMode)
+{
+#if ENABLED(RDOC_WIN32)
+  // 0 = IAT patching (default), 1 = MinHook
+  Win32_SetHookMode(hookMode == 1);
+#endif
 }

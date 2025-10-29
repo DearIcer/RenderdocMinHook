@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Development|Win32">
@@ -68,7 +68,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(SolutionDir)renderdoc\;$(SolutionDir)renderdoc\3rdparty\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)renderdoc\;$(SolutionDir)renderdoc\3rdparty\;$(SolutionDir)renderdoc\3rdparty\minhook\include\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>RDOC_BASE_NAME=$(ProjectName);RENDERDOC_EXPORTS;RENDERDOC_PLATFORM_WIN32;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -133,6 +133,7 @@
     <ClInclude Include="3rdparty\jpeg-compressor\jpge.h" />
     <ClInclude Include="3rdparty\lz4\lz4.h" />
     <ClInclude Include="3rdparty\md5\md5.h" />
+    <ClInclude Include="3rdparty\minhook\include\MinHook.h" />
     <ClInclude Include="3rdparty\miniz\miniz.h" />
     <ClInclude Include="3rdparty\plthook\plthook.h" />
     <ClInclude Include="3rdparty\pugixml\pugiconfig.hpp" />
@@ -526,6 +527,37 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
+    <!-- MinHook source files -->
+    <ClCompile Include="3rdparty\minhook\src\buffer.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\hook.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\trampoline.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\hde\hde32.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\hde\hde64.c">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
     <ClCompile Include="android\android.cpp" />
     <ClCompile Include="android\android_tools.cpp" />
     <ClCompile Include="android\android_utils.cpp" />
@@ -901,6 +933,12 @@ namespace DXCEnumerateAndCheck {
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
+    <Content Include="3rdparty\minhook\bin\MinHook.x64.dll" />
+    <Content Include="3rdparty\minhook\bin\MinHook.x64.exp" />
+    <Content Include="3rdparty\minhook\bin\MinHook.x64.lib" />
+    <Content Include="3rdparty\minhook\bin\MinHook.x86.dll" />
+    <Content Include="3rdparty\minhook\bin\MinHook.x86.exp" />
+    <Content Include="3rdparty\minhook\bin\MinHook.x86.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

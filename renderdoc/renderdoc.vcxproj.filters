@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Common">
@@ -138,6 +138,15 @@
     </Filter>
     <Filter Include="3rdparty\md5">
       <UniqueIdentifier>{fcbf71ce-3767-435c-9aa2-e1327b9016f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdparty\minhook">
+      <UniqueIdentifier>{12345678-1234-1234-1234-123456789012}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdparty\minhook\src">
+      <UniqueIdentifier>{23456789-2345-2345-2345-234567890123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3rdparty\minhook\src\hde">
+      <UniqueIdentifier>{34567890-3456-3456-3456-345678901234}</UniqueIdentifier>
     </Filter>
     <Filter Include="Replay\Common">
       <UniqueIdentifier>{02773850-117a-47d9-b238-d5d4b96468b3}</UniqueIdentifier>
@@ -973,6 +982,22 @@
     </ClCompile>
     <ClCompile Include="3rdparty\md5\md5.c">
       <Filter>3rdparty\md5</Filter>
+    </ClCompile>
+    <!-- MinHook source files -->
+    <ClCompile Include="3rdparty\minhook\src\buffer.c">
+      <Filter>3rdparty\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\hook.c">
+      <Filter>3rdparty\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\trampoline.c">
+      <Filter>3rdparty\minhook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\hde\hde32.c">
+      <Filter>3rdparty\minhook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="3rdparty\minhook\src\hde\hde64.c">
+      <Filter>3rdparty\minhook\src\hde</Filter>
     </ClCompile>
     <ClCompile Include="replay\dummy_driver.cpp">
       <Filter>Replay</Filter>

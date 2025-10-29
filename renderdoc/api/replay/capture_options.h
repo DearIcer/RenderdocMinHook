@@ -246,6 +246,19 @@ Default - 0 Megabytes
 :type: int
 )");
   uint32_t softMemoryLimit;
+  
+  DOCUMENT(R"(Select which hooking method to use on Windows platforms. 
+RenderDoc supports two different hooking mechanisms on Windows - the default IAT patching method, 
+and an alternative MinHook method.
+
+Default - 0 (IAT patching)
+
+0 - Use IAT patching method for hooking.
+1 - Use MinHook method for hooking.
+
+:type: int
+)");
+  uint32_t hookMode;
 };
 
 DECLARE_REFLECTION_STRUCT(CaptureOptions);

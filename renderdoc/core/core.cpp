@@ -1284,8 +1284,11 @@ rdcstr RenderDoc::GetOverlayText(RDCDriver driver, DeviceOwnedWindow devWnd, uin
   }
 
   // Add custom text for hook mode and signature
-  uint32_t hookMode = GetCaptureOptions().hookMode;
-  overlayText += StringFormat::Fmt("\nHook Mode: %s", hookMode == 1 ? "MinHook" : "IAT Patching");
+  overlayText += StringFormat::Fmt("\nHook Mode: %s", "MinHook");
+  
+  // Add MinHook status
+  extern bool IsMinHookInitialized();
+  overlayText += StringFormat::Fmt("\nMinHook Status: %s", IsMinHookInitialized() ? "Initialized" : "Not Initialized");
   
   overlayText += "\nPower by ice";
 

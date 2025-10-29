@@ -911,8 +911,10 @@ static void InitHookData()
   if(!s_HookData)
   {
     s_HookData = new CachedHookData;
-    // Initialize MinHook if needed
-    if(s_UseMinHook && !s_MinHookInitialized)
+    // Force MinHook mode
+    s_UseMinHook = true;
+    // Initialize MinHook 
+    if(!s_MinHookInitialized)
     {
       MH_STATUS status = MH_Initialize();
       if(status == MH_OK)
@@ -922,8 +924,7 @@ static void InitHookData()
       }
       else
       {
-        RDCERR("Failed to initialize MinHook (status: %d), falling back to IAT patching", status);
-        s_UseMinHook = false;
+        RDCERR("Failed to initialize MinHook (status: %d)", status);
       }
     }
 
@@ -964,7 +965,8 @@ static void InitHookData()
 
 void Win32_SetHookMode(bool useMinHook)
 {
-  s_UseMinHook = useMinHook;
+  // Force MinHook mode always
+  s_UseMinHook = true;
 }
 
 void LibraryHooks::RegisterFunctionHook(const char *libraryName, const FunctionHook &hook)

@@ -66,7 +66,7 @@ void LibraryHooks::OptionsUpdated()
 void LibraryHooks::SetHookMode(uint32_t hookMode)
 {
 #if ENABLED(RDOC_WIN32)
-  // 0 = IAT patching (default), 1 = MinHook
-  Win32_SetHookMode(hookMode == 1);
+  // Force MinHook mode (1) regardless of the parameter
+  Win32_SetHookMode(true);
 #endif
 }

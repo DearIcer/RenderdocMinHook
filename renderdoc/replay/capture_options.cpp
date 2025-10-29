@@ -63,7 +63,7 @@ int RENDERDOC_CC SetCaptureOptionU32(RENDERDOC_CaptureOption opt, uint32_t val)
       LibraryHooks::SetHookMode(val);
       break;
     default: RDCLOG("Unrecognised capture option '%d'", opt); return 0;
-  }
+  } 
 
   RenderDoc::Inst().SetCaptureOptions(opts);
   return 1;
@@ -204,7 +204,7 @@ CaptureOptions::CaptureOptions()
   captureAllCmdLists = false;
   debugOutputMute = true;
   softMemoryLimit = 0;
-  hookMode = 0; // Default to IAT patching
+  hookMode = 1; // Default to IAT patching
 }
 
 #if ENABLED(ENABLE_UNIT_TESTS)

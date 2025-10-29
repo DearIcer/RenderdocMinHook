@@ -900,12 +900,17 @@ FARPROC WINAPI Hooked_GetProcAddress(HMODULE mod, LPCSTR func)
 
   return GetProcAddress(mod, func);
 }
+
+bool IsMinHookInitialized()
+{
+  return s_MinHookInitialized;
+}
+
 static void InitHookData()
 {
   if(!s_HookData)
   {
     s_HookData = new CachedHookData;
-
     // Initialize MinHook if needed
     if(s_UseMinHook && !s_MinHookInitialized)
     {
@@ -913,6 +918,7 @@ static void InitHookData()
       if(status == MH_OK)
       {
         s_MinHookInitialized = true;
+        RDCLOG("Initialized MinHook");
       }
       else
       {
@@ -920,7 +926,7 @@ static void InitHookData()
         s_UseMinHook = false;
       }
     }
-    
+
     RDCASSERT(s_HookData->DllHooks.empty());
     s_HookData->DllHooks["kernel32.dll"].FunctionHooks.push_back(
         FunctionHook("LoadLibraryA", NULL, &Hooked_LoadLibraryA));
@@ -1066,7 +1072,14 @@ void LibraryHooks::RemoveHooks()
   // If using MinHook, uninitialize it
   if(s_UseMinHook && s_MinHookInitialized)
   {
-    MH_STATUS status = MH_Uninitialize();
+    // Disable all hooks first
+    MH_STATUS status = MH_DisableHook(MH_ALL_HOOKS);
+    if(status != MH_OK)
+    {
+      RDCERR("Failed to disable all MinHook hooks: %d", status);
+    }
+    
+    status = MH_Uninitialize();
     if(status != MH_OK)
     {
       RDCERR("Failed to uninitialize MinHook: %d", status);
